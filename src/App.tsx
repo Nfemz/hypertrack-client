@@ -6,7 +6,7 @@ import "./App.css";
 
 import { Header, Sidebar } from "./Components";
 import { AppLayout, ContentWrapper } from "./Layout";
-import { Students, Config } from "./Views";
+import { Students, Config, Student } from "./Views";
 
 function App() {
   return (
@@ -19,6 +19,7 @@ function App() {
             <Switch>
               <Route exact path="/config" component={Config} />
               <Route exact path="/students" component={Students} />
+              <Route path="/students/:deviceId" component={Student} />
               <Route path="/">
                 <Redirect to="/students" />
               </Route>
