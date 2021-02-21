@@ -13,7 +13,6 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Columns } from "./utils";
 const axios = require("axios").default;
-const configs = require("../../config.json");
 
 export const Student = ({ match: { params } }) => {
   const history = useHistory();
@@ -32,20 +31,20 @@ export const Student = ({ match: { params } }) => {
       const url = `https://hypertrack-server.herokuapp.com/device/${params.deviceId}`;
       const res = await axios.get(url);
       setStudentInfo(res.data);
+    }
 
-      async function getLocationHistory() {
-        const url = `https://hypertrack-server.herokuapp.com/locations/${params.deviceId}`;
+    async function getLocationHistory() {
+      const url = `https://hypertrack-server.herokuapp.com/locations/${params.deviceId}`;
 
-        const res = await axios.get(url);
-        console.warn(res.data);
+      const res = await axios.get(url);
+      console.warn(res.data);
 
-        setLocationHistory(res.data);
-      }
-
-      getLocationHistory();
+      setLocationHistory(res.data);
     }
 
     getStudentDetails();
+    getLocationHistory();
+    // eslint-disable-next-line
   }, []);
 
   if (!studentInfo.device_id) {
