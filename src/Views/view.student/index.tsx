@@ -23,6 +23,7 @@ const axios = require("axios").default;
 export const Student = ({ match: { params } }) => {
   const history = useHistory();
   const [form] = Form.useForm();
+
   const [studentInfo, setStudentInfo] = useState({
     device_id: null,
     device_status: "inactive",
@@ -31,9 +32,9 @@ export const Student = ({ match: { params } }) => {
     latitude: null,
     device_user: null,
   });
-
   const [locationHistory, setLocationHistory] = useState([]);
   const [pendingStudentName, setPendingStudentName] = useState("");
+  let subscription = null;
 
   useEffect(() => {
     async function getStudentDetails() {
@@ -44,9 +45,7 @@ export const Student = ({ match: { params } }) => {
 
     async function getLocationHistory() {
       const url = `https://hypertrack-server.herokuapp.com/locations/${params.deviceId}`;
-
       const res = await axios.get(url);
-
       setLocationHistory(res.data);
     }
 
