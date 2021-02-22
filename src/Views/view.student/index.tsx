@@ -11,7 +11,13 @@ import {
 } from "antd";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { Columns } from "./utils";
+import {
+  Columns,
+  getUser,
+  isDeviceActive,
+  updateDeviceStatus,
+  updateUser,
+} from "./utils";
 const axios = require("axios").default;
 
 export const Student = ({ match: { params } }) => {
@@ -19,12 +25,15 @@ export const Student = ({ match: { params } }) => {
   const [form] = Form.useForm();
   const [studentInfo, setStudentInfo] = useState({
     device_id: null,
-    device_status: null,
+    device_status: "inactive",
     battery_status: null,
     longitude: null,
     latitude: null,
+    device_user: null,
   });
+
   const [locationHistory, setLocationHistory] = useState([]);
+  const [pendingStudentName, setPendingStudentName] = useState("");
 
   useEffect(() => {
     async function getStudentDetails() {
@@ -37,7 +46,6 @@ export const Student = ({ match: { params } }) => {
       const url = `https://hypertrack-server.herokuapp.com/locations/${params.deviceId}`;
 
       const res = await axios.get(url);
-      console.warn(res.data);
 
       setLocationHistory(res.data);
     }
@@ -82,10 +90,19 @@ export const Student = ({ match: { params } }) => {
       <Switch
         checkedChildren="Disable Device"
         unCheckedChildren="Enable Device"
-        checked={
-          studentInfo && studentInfo.device_status === "active" ? true : false
-        }
-        onClick={() => setStudentInfo({ ...studentInfo, device_status: null })}
+        checked={isDeviceActive(studentInfo.device_status)}
+        onClick={async () => {
+          if (
+            studentInfo.device_status &&
+            studentInfo.device_status === "active"
+          ) {
+            setStudentInfo({ ...studentInfo, device_status: "inactive" });
+            await updateDeviceStatus("inactive", studentInfo.device_id);
+          } else {
+            setStudentInfo({ ...studentInfo, device_status: "active" });
+            await updateDeviceStatus("active", studentInfo.device_id);
+          }
+        }}
       />
       <Divider />
       <h2 style={{ alignSelf: "center" }}>Student Information</h2>
@@ -99,14 +116,23 @@ export const Student = ({ match: { params } }) => {
         }}
       >
         <Form form={form} name="student-details">
-          <Form.Item name="student-name" label="Name">
-            <Input />
-          </Form.Item>
-          <Form.Item name="student-email" label="Email">
-            <Input />
+          <Form.Item
+            name="student-name"
+            label="Name"
+            initialValue={getUser(studentInfo.device_user)}
+          >
+            <Input
+              onChange={(event) => {
+                setPendingStudentName(event.target.value);
+              }}
+            />
           </Form.Item>
           <Form.Item name="update-student">
-            <Button type="primary" htmlType="submit">
+            <Button
+              type="primary"
+              htmlType="submit"
+              onClick={() => updateUser(pendingStudentName, params.deviceId)}
+            >
               Update
             </Button>
           </Form.Item>

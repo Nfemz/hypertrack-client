@@ -1,5 +1,6 @@
 import React from "react";
 import { Tag } from "antd";
+import moment from "moment";
 
 export function goToStudent(record, history) {
   const studentUrl = `/students/${record.device_id}`;
@@ -9,7 +10,7 @@ export function goToStudent(record, history) {
 export const Columns = [
   {
     title: "Name",
-    dataIndex: "name",
+    dataIndex: "device_user",
     key: "name",
   },
   {
@@ -43,5 +44,9 @@ export const Columns = [
     dataIndex: "recorded_at",
     key: "recorded_at",
     render: (timeStamp) => new Date(timeStamp).toLocaleString(),
+    sorter: {
+      compare: (a, b) =>
+        moment(a.recorded_at).unix() - moment(b.recorded_at).unix(),
+    },
   },
 ];
